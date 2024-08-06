@@ -1,8 +1,8 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 import {User} from "../models/user.model.js";
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
-import { ApiError } from "../utils/ApiError.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken"
 
 const generateAccessAndRefereshTokens = async function(userId){
@@ -136,6 +136,7 @@ const loginUser = asyncHandler( async (req,res)=>{
             "User logged In Successfully"
         )
     )
+  
 
 })
 
@@ -326,7 +327,7 @@ const updatecoverImage = asyncHandler( async (req,res)=>{
   .json(new ApiResponse(200, userDetail,"coverImage updated  successfully!!"))
   
 })
-
+// update bio
 export {
   registerUser,
   loginUser,
@@ -337,4 +338,5 @@ export {
   updateAccountDetails,
   updateAvatar,
   updatecoverImage,
+  // update bio
 }

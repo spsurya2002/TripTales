@@ -14,11 +14,7 @@ const likesSchema= new Schema({
         type:Schema.Types.ObjectId,//one to who being subscribed
         ref:"User"
     },
-    
-    // tweet:{
-
-    // }
-
+ 
 },{timestamps:true});
 
 export const Like = mongoose.model("Like",likesSchema);
