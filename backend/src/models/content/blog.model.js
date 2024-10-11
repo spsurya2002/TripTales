@@ -14,6 +14,7 @@ const blogSchema = new Schema({
             url: String,
             public_id: String,
         },
+        required:false
     },
     owner:{
         type:Schema.Types.ObjectId,

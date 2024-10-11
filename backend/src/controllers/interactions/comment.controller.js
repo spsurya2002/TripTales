@@ -108,27 +108,11 @@ const deleteComment = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, "Comment deleted successfully", deletedComment));
 });
 
-// Remove all comments by a user on any content type
-const removeAllCommentsByUser = asyncHandler(async (req, res) => {
-    const userId = req.user?._id;
 
-    if (!isValidObjectId(userId)) {
-        throw new ApiError(400, "Invalid user Id");
-    }
-
-    const removedComments = await Comment.deleteMany({ owner: userId });
-
-    if (removedComments.deletedCount === 0) {
-        throw new ApiError(400, "Something went wrong while removing all comments");
-    }
-
-    return res.status(200).json(new ApiResponse(200, "All comments removed successfully"));
-});
 
 export {
     addComment,
     getComments,
     updateComment,
     deleteComment,
-    removeAllCommentsByUser,
 };

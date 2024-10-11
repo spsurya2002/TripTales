@@ -1,100 +1,100 @@
+// src/controllers/interactions/like.controller.js
+
 import mongoose, { isValidObjectId } from "mongoose";
-import { LikeAlbum } from "../../models/interactions/like.model.js";
+import { Like } from "../../models/interactions/like.model.js";
 import { Album } from "../../models/content/album.model.js";
+import { Video } from "../../models/content/video.model.js";
+import { Blog } from "../../models/content/blog.model.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 
-// Like an album
-const likeAlbum = asyncHandler(async (req, res) => {
-    const { albumId } = req.params;
+// Helper function to get the content model based on the type
+const getContentModel = (contentType) => {
+    switch (contentType) {
+        case "album":
+            return Album;
+        case "video":
+            return Video;
+        case "blog":
+            return Blog;
+        default:
+            throw new ApiError(400, "Invalid content type");
+    }
+};
 
-    if (!isValidObjectId(albumId)) {
-        throw new ApiError(400, "Invalid album Id");
+// Add a like to any content type (album, video, blog)
+const addLike = asyncHandler(async (req, res) => {
+    const { contentType, contentId } = req.params;
+    
+    if (!isValidObjectId(contentId)) {
+        throw new ApiError(400, `Invalid ${contentType} Id`);
     }
 
-    const album = await Album.findById(albumId);
-
-    if (!album) {
-        throw new ApiError(404, "Album doesn't exist");
+    
+    const ContentModel = getContentModel(contentType);
+    console.log("--->"+contentType,contentId,ContentModel);
+    const contentItem = await ContentModel.findById(contentId);
+    
+    if (!contentItem) {
+        throw new ApiError(404, `${contentType} doesn't exist`);
     }
-
-    const existingLike = await LikeAlbum.findOne({
-        album: albumId,
-        likedBy: req.user?._id
+    
+    const existingLike = await Like.findOne({
+        contentId,
+        contentType,
+        owner: req.user?._id,
     });
 
     if (existingLike) {
-        throw new ApiError(400, "Album is already liked");
+        throw new ApiError(400, "You have already liked this content");
     }
 
-    const newLike = await LikeAlbum.create({
-        album: albumId,
-        likedBy: req.user?._id
+    const newLike = await Like.create({
+        contentId,
+        contentType,
+        owner: req.user?._id,
     });
 
-    return res.status(201).json(new ApiResponse(201, "Album liked successfully", newLike));
+    return res.status(201).json(new ApiResponse(201, "Like added successfully", newLike));
 });
 
-// Get all liked albums
-const getLikedAlbums = asyncHandler(async (req, res) => {
-    const userId = req.user?._id;
+// Get all likes for a specific content type
+const getLikes = asyncHandler(async (req, res) => {
+    const { contentType, contentId } = req.params;
 
-    if (!isValidObjectId(userId)) {
-        throw new ApiError(400, "Invalid user Id");
+    if (!isValidObjectId(contentId)) {
+        throw new ApiError(400, `Invalid ${contentType} Id`);
     }
 
-    const likedAlbums = await LikeAlbum.find({ likedBy: userId })
-        .populate('album')
-        .lean();
+    const likes = await Like.find({ contentId, contentType }).populate("owner", "username").lean();
 
-    if (!likedAlbums.length) {
-        throw new ApiError(404, "No liked albums found for this user");
-    }
-
-    return res.status(200).json(new ApiResponse(200, "Liked albums fetched successfully", likedAlbums));
+    return res.status(200).json(new ApiResponse(200, "Likes fetched successfully", likes));
 });
 
-// Unlike an album
-const unlikeAlbum = asyncHandler(async (req, res) => {
-    const { albumId } = req.params;
+// Remove a like from any content type
+const removeLike = asyncHandler(async (req, res) => {
+    const { contentType, contentId } = req.params;
 
-    if (!isValidObjectId(albumId)) {
-        throw new ApiError(400, "Invalid album Id");
+    if (!isValidObjectId(contentId)) {
+        throw new ApiError(400, `Invalid ${contentType} Id`);
     }
 
-    const removedLike = await LikeAlbum.findOneAndDelete({
-        album: albumId,
-        likedBy: req.user?._id
+    const deletedLike = await Like.findOneAndDelete({
+        contentId,
+        contentType,
+        owner: req.user?._id,
     });
 
-    if (!removedLike) {
-        throw new ApiError(400, "Something went wrong while unliking the album");
+    if (!deletedLike) {
+        throw new ApiError(404, "Like not found or you don't have permission to remove this like");
     }
 
-    return res.status(200).json(new ApiResponse(200, "Album unliked successfully", removedLike));
-});
-
-// Remove all album likes by user
-const removeAllAlbumLikes = asyncHandler(async (req, res) => {
-    const userId = req.user?._id;
-
-    if (!isValidObjectId(userId)) {
-        throw new ApiError(400, "Invalid user Id");
-    }
-
-    const removedLikes = await LikeAlbum.deleteMany({ likedBy: userId });
-
-    if (removedLikes.deletedCount === 0) {
-        throw new ApiError(400, "Something went wrong while removing all album likes");
-    }
-
-    return res.status(200).json(new ApiResponse(200, "All album likes removed successfully"));
+    return res.status(200).json(new ApiResponse(200, "Like removed successfully", deletedLike));
 });
 
 export {
-    likeAlbum,
-    getLikedAlbums,
-    unlikeAlbum,
-    removeAllAlbumLikes
+    addLike,
+    getLikes,
+    removeLike,
 };

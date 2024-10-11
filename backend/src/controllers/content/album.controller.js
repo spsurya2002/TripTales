@@ -51,7 +51,7 @@ const updateAlbum = asyncHandler(async (req, res) => {
     const { albumId } = req.params
     //TODO: update album details like title, description
     if(!isValidObjectId(albumId)){
-        throw new ApiError(400, "invalid videoId!!");
+        throw new ApiError(400, "invalid albumId!!");
     }
     const album = await Album.findById(albumId);
     if(!album){
