@@ -21,10 +21,16 @@ app.use(express.urlencoded({
 app.use(express.static("public"))
 app.use(cookieParser())
 
-
+// import routers
 import authRouter from './src/routes/auth.routes.js'
+import healthcheckRouter from "./src/routes/healthcheck.routes.js"
+
+// //routes declaration
+app.use("/api/v1/auth", authRouter)
+app.use("/api/v1/healthcheck", healthcheckRouter)
+
 // import aiChatRouter from './routes/aiChat.routes.js'
-// import healthcheckRouter from "./src/routes/healthcheck.routes.js"
+
 // import subscriptionRouter from "./routes/subscription.routes.js"
 // // import commentRouter from "./routes/comment.routes.js"
 // // import likeRouter from "./routes/like.routes.js"
@@ -40,10 +46,9 @@ import authRouter from './src/routes/auth.routes.js'
 
 
 
-// //routes declaration
-app.use("/api/v1/auth", authRouter)
+
 // app.use("/api/v1/chat",aiChatRouter)
-// app.use("/api/v1/healthcheck", healthcheckRouter)
+
 // app.use("/api/v1/subscriptions", subscriptionRouter)
 // // app.use("/api/v1/comments", commentRouter)
 // // app.use("/api/v1/likes", likeRouter)

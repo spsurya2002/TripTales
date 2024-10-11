@@ -3,6 +3,7 @@ import {
     registerUser,
     loginUser,
     logoutUser,
+    forgotPassword,
     refreshAccessToken,
     changeCurrentPassword,
     getCurrentUser,
@@ -35,12 +36,15 @@ router.route("/login").post(loginUser);
 
 // User logout with JWT verification
 router.route("/logout").post(verifyJWT, logoutUser);
+// Forgot password route
 
+router.route("/forgot-password").post(forgotPassword);
 // Refresh access token
 router.route("/refresh-token").post(refreshAccessToken);
 
 // Change current user password (requires JWT verification)
 router.route("/change-password").put(verifyJWT, changeCurrentPassword);
+
 
 // Get current user data (requires JWT verification)
 router.route("/get-user").get(verifyJWT, getCurrentUser);
@@ -55,6 +59,37 @@ router.route("/update-avatar").put(verifyJWT, upload.single("avatar"), updateAva
 router.route("/update-coverImage").put(verifyJWT, upload.single("coverImage"), updateCoverImage);
 
 export default router;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

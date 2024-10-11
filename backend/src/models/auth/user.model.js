@@ -51,7 +51,15 @@ const userSchema = new Schema({
     socialMediaHandles:[{
             type:String
     }],
-},{timestamps:true});
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
+    
+    verificationToken: String,
+	verificationTokenExpiresAt: Date,
+},
+{timestamps:true});
 
 userSchema.pre("save", async function (next) {
     if(!this.isModified("password")) return next();

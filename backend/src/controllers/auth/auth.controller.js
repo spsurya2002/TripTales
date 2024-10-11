@@ -4,6 +4,13 @@ import { ApiError } from "../../utils/ApiError.js";
 import {User} from "../../models/auth/user.model.js";
 import {uploadOnCloudinary} from "../../utils/cloudinary.js"
 import jwt from "jsonwebtoken"
+import crypto from 'crypto';
+import {
+	sendPasswordResetEmail,
+	sendResetSuccessEmail,
+	sendVerificationEmail,
+	sendWelcomeEmail,
+} from "../../mail/emails.js";
 
 const generateAccessAndRefereshTokens = async function(userId){
        try {
@@ -64,14 +71,16 @@ const registerUser = asyncHandler( async (req,res)=>{
       throw new ApiError(400,"Avatar file is required")
     }
     // //upload them to cloudinary
-    console.log("surya-->"+avatarLocalPath);
+   
     const avatar = await uploadOnCloudinary(avatarLocalPath);
-    console.log("surya-->"+avatar);
+ 
     const coverImage = await uploadOnCloudinary(coverImageLocalPath);
     if(!avatar){
       throw new ApiError(400,"failure occured at upload on cloudinary!!")
     }
    
+    const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+
     // create user object and upload in db
     const user =  await  User.create({
       fullName,
@@ -80,13 +89,15 @@ const registerUser = asyncHandler( async (req,res)=>{
       password,
       avatar: avatar.url,
       coverImage:coverImage?.url||"",
+      verificationToken,
+			verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
     })
     const createdUser = await User.findById(user._id).select("-password -refreshToken")
     
   if (!createdUser) {
       throw new ApiError(500, "Something went wrong while registering the user")
   }
-
+  await sendVerificationEmail(user.email, verificationToken);
   return res.status(201).json(
       new ApiResponse(200, createdUser, "User created Successfully")
   )
@@ -140,7 +151,7 @@ const loginUser = asyncHandler( async (req,res)=>{
     )
   
 
-})
+});
 
 const logoutUser = asyncHandler(async(req, res) => {
   await User.findByIdAndUpdate(
@@ -165,6 +176,29 @@ const logoutUser = asyncHandler(async(req, res) => {
   .clearCookie("accessToken", options)
   .clearCookie("refreshToken", options)
   .json(new ApiResponse(200, {}, "User logged Out"))
+})
+
+const forgotPassword = asyncHandler(async(req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+
+		if (!user) {
+			throw new ApiError(500, "user not found")
+		}
+
+		// Generate reset token
+		const resetToken = crypto.randomBytes(20).toString("hex");
+		const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
+
+		user.resetPasswordToken = resetToken;
+		user.resetPasswordExpiresAt = resetTokenExpiresAt;
+
+		await user.save();
+
+		// send email
+		await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}/reset-password/${resetToken}`);
+
+		return res.status(200).json(new ApiResponse(200, "Password reset link sent to your email"));
 })
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
@@ -216,29 +250,20 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 })
 
 const changeCurrentPassword = asyncHandler(async(req, res) => {
-  
   const {oldPassword, newPassword} = req.body
-
-  
-
   const user = await User.findById(req.user?._id)
-
   const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
-
   if (!isPasswordCorrect) {
       throw new ApiError(400, "Invalid old password")
   }
-
   user.password = newPassword
   await user.save({validateBeforeSave: false})
-
   return res
   .status(200)
   .json(new ApiResponse(200, {}, "Password changed successfully"))
 })
 
 const getCurrentUser = asyncHandler( async(req,res)=>{
-
   return res
   .status(200)
   .json(new ApiResponse(200, req.user , "user details are here!"))
@@ -267,31 +292,6 @@ const updateAccountDetails = asyncHandler( async (req,res)=>{
     return res
     .status(200)
     .json(new ApiResponse(200,user,"Updated account details!!"))
-
-})
-const completeProfile = asyncHandler( async (req,res)=>{
-  // to complete user's information for profile
-
-  // const {bio,} = req.body;
-  
-  // if(!(fullName&&email)) {
-  //   throw new ApiError(400,"all fields are required!!");
-  // }
-  // const user = await User.findByIdAndUpdate(
-  //   req.user?._id,
-  //   {
-  //     $set:{
-  //       fullName:fullName,
-  //       email:email
-  //     }
-  //   },
-  //   {new:true}
-
-  // ).select("-password");
-  // // console.log(user);
-  // return res
-  // .status(200)
-  // .json(new ApiResponse(200,user,"Updated account details!!"))
 
 })
 
@@ -354,16 +354,16 @@ const updateCoverImage = asyncHandler( async (req,res)=>{
   .json(new ApiResponse(200, userDetail,"coverImage updated  successfully!!"))
   
 })
-// update bio
+
 export {
   registerUser,
   loginUser,
   logoutUser,
   refreshAccessToken,
+  forgotPassword,
   changeCurrentPassword,
   getCurrentUser,
   updateAccountDetails,
   updateAvatar,
   updateCoverImage,
-  completeProfile
 }
