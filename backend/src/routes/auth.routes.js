@@ -12,6 +12,7 @@ import {
     updateAvatar,
     updateCoverImage,
     verifyEmail,
+    checkAuth
  } from "../controllers/auth/auth.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -32,7 +33,7 @@ router.route("/signup").post(
     ]), 
     registerUser
 );
-
+router.route("/check-auth").get( verifyJWT, checkAuth);
 router.route("/login").post(loginUser);// User login
 
 router.route("/logout").post(verifyJWT, logoutUser);// User logout with JWT verification

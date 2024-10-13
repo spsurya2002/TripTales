@@ -13,7 +13,7 @@ const userSchema = new Schema({
     },
     fullName:{
         type:String,
-        required:true,
+        // required:true,
         lowercase:true,
         index:true
 
@@ -31,7 +31,7 @@ const userSchema = new Schema({
     },
     avatar:{
         type:String,//cloudinary
-        required:true
+        // required:true
     },
     coverImage:{
         type:String,
@@ -49,6 +49,10 @@ const userSchema = new Schema({
     isVerified: {
         type: Boolean,
         default: false,
+    },
+    lastLogin: {
+        type: Date,
+        default: Date.now,
     },
     resetPasswordToken: String,
     resetPasswordExpiresAt: Date,
