@@ -2,10 +2,10 @@ import Conversation from "../../models/conversation.model.js";
 import mongoose, {isValidObjectId} from "mongoose"
 import Message from "../../models/message.model.js";
 import { v2 as cloudinary } from "cloudinary";
-import {uploadOnCloudinary} from "../../utils/cloudinary.js"
-import { asyncHandler } from "../../utils/asyncHandler.js";
-import { ApiResponse } from "../../utils/ApiResponse.js";
-import { ApiError } from "../../utils/ApiError.js";
+import {uploadOnCloudinary} from "../utils/cloudinary.js"
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 // import { getRecipientSocketId, io } from "../socket/socket.js";
 
 

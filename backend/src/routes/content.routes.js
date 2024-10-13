@@ -1,5 +1,5 @@
-//Routes For albums
 import { Router } from "express";
+//imports for album
 import {
    uploadAlbum,
    updateAlbum,
@@ -7,24 +7,8 @@ import {
    getAllAlbums,
    deleteAlbum
 } from "../controllers/content/album.controller.js";
-import {upload} from "../middlewares/multer.middleware.js";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
-
-const router = Router();
-router.use(verifyJWT);
-
-router.route("/albums")
-   .post(upload.fields([{ name: 'image', maxCount: 10 }]), uploadAlbum) // Create/upload an album
-   .get(getAllAlbums); // Get all albums
-
-router.route("/albums/:albumId")
-   .get(getAlbumById)  // Get album by ID
-   .put(updateAlbum)    // Update an album by ID
-   .delete(deleteAlbum); // Delete an album by ID
-
-
-//Routes For videos
-   import {
+//imports for videos
+import {
     getAllVideos,
     publishAVideo,
     getVideoById,
@@ -32,8 +16,34 @@ router.route("/albums/:albumId")
     deleteVideo,
     changeThumbnail
  } from "../controllers/content/video.controller.js";
+ //imports for blogs
+import {
+    postBlog,
+    getAllBlogs,
+    getRecentBlogs,
+    getBlogById,
+    updateBlogByID,
+    deleteBlogByID
+  } from "../controllers/content/blog.controller.js";
 
-// Routes for managing videos
+
+import {upload} from "../middlewares/multer.middleware.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
+const router = Router();
+router.use(verifyJWT);
+
+
+//Routes For albums
+router.route("/albums")
+   .post(upload.fields([{ name: 'image', maxCount: 10 }]), uploadAlbum) // Create/upload an album
+   .get(getAllAlbums); // Get all albums
+router.route("/albums/:albumId")
+   .get(getAlbumById)  // Get album by ID
+   .put(updateAlbum)    // Update an album by ID
+   .delete(deleteAlbum); // Delete an album by ID
+
+
+//Routes For videos
 router.route("/videos")
     .post(upload.fields([
       {
@@ -55,19 +65,7 @@ router.route("/videos/change-thumbnail/:videoId")
     .put(upload.single("thumbnail"), changeThumbnail);
 
 
-
 //Routes for blog content    
-// Routes for blog content    
-import {
-  postBlog,
-  getAllBlogs,
-  getRecentBlogs,
-  getBlogById,
-  updateBlogByID,
-  deleteBlogByID
-} from "../controllers/content/blog.controller.js";
-
-// Blog routes
 router.route("/blogs")
     .post(upload.single("picture"),postBlog)       // Create a new blog
     .get(getAllBlogs);    // Get all blogs

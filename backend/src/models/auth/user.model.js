@@ -39,12 +39,7 @@ const userSchema = new Schema({
     refreshToken:{
         type:String,
     },
-    // watchHistory:[
-    //     {
-    //     type:Schema.Types.ObjectId,
-    //     ref:"Video"
-    //     }
-    // ],
+   
     bio:{
         type:String,
     },
@@ -55,9 +50,11 @@ const userSchema = new Schema({
         type: Boolean,
         default: false,
     },
-    
+    resetPasswordToken: String,
+    resetPasswordExpiresAt: Date,
     verificationToken: String,
-	verificationTokenExpiresAt: Date,
+    verificationTokenExpiresAt: Date,
+    
 },
 {timestamps:true});
 

@@ -4,12 +4,14 @@ import {
     loginUser,
     logoutUser,
     forgotPassword,
+    resetPassword,
     refreshAccessToken,
     changeCurrentPassword,
     getCurrentUser,
     updateAccountDetails,
     updateAvatar,
     updateCoverImage,
+    verifyEmail,
  } from "../controllers/auth/auth.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -17,7 +19,7 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 const router = Router();
 
 // Register user with avatar and coverImage upload
-router.route("/register").post(
+router.route("/signup").post(
     upload.fields([
         {
             name: "avatar",
@@ -31,32 +33,25 @@ router.route("/register").post(
     registerUser
 );
 
-// User login
-router.route("/login").post(loginUser);
+router.route("/login").post(loginUser);// User login
 
-// User logout with JWT verification
-router.route("/logout").post(verifyJWT, logoutUser);
-// Forgot password route
+router.route("/logout").post(verifyJWT, logoutUser);// User logout with JWT verification
 
-router.route("/forgot-password").post(forgotPassword);
-// Refresh access token
-router.route("/refresh-token").post(refreshAccessToken);
+router.route("/verify-email").post( verifyEmail);//verify email
 
-// Change current user password (requires JWT verification)
-router.route("/change-password").put(verifyJWT, changeCurrentPassword);
+router.route("/forgot-password").post(forgotPassword);// Forgot password route
+router.route("/reset-password/:token").post( resetPassword);
+router.route("/refresh-token").post(refreshAccessToken);// Refresh access token
 
+router.route("/change-password").put(verifyJWT, changeCurrentPassword);// Change current user password (requires JWT verification)
 
-// Get current user data (requires JWT verification)
-router.route("/get-user").get(verifyJWT, getCurrentUser);
+router.route("/get-user").get(verifyJWT, getCurrentUser);// Get current user data (requires JWT verification)
 
-// Update account details (requires JWT verification)
-router.route("/update-account").put(verifyJWT, updateAccountDetails);
+router.route("/update-account").put(verifyJWT, updateAccountDetails);// Update account details (requires JWT verification)
 
-// Update avatar (requires JWT verification and avatar upload)
-router.route("/update-avatar").put(verifyJWT, upload.single("avatar"), updateAvatar);
+router.route("/update-avatar").put(verifyJWT, upload.single("avatar"), updateAvatar);// Update avatar (requires JWT verification and avatar upload)
 
-// Update cover image (requires JWT verification and coverImage upload)
-router.route("/update-coverImage").put(verifyJWT, upload.single("coverImage"), updateCoverImage);
+router.route("/update-coverImage").put(verifyJWT, upload.single("coverImage"), updateCoverImage);// Update cover image (requires JWT verification and coverImage upload)
 
 export default router;
 

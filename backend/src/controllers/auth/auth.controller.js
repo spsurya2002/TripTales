@@ -102,6 +102,39 @@ const registerUser = asyncHandler( async (req,res)=>{
       new ApiResponse(200, createdUser, "User created Successfully")
   )
 })  
+const verifyEmail = asyncHandler( async (req, res) => {
+	const { code } = req.body;
+		const user = await User.findOne({
+			verificationToken: code,
+			verificationTokenExpiresAt: { $gt: Date.now() },
+		});
+
+		if (!user) {
+      throw new ApiError(400,"Invalid or expired verification code");
+		}
+
+		user.isVerified = true;
+		user.verificationToken = undefined;
+		user.verificationTokenExpiresAt = undefined;
+		await user.save();
+
+		await sendWelcomeEmail(user.email, user.fullName);
+
+		
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200, 
+            {
+              ...user._doc,
+              password: undefined,
+            },
+            "Email verified successfully"
+        )
+    )
+	
+});
 
 const loginUser = asyncHandler( async (req,res)=>{
   /*
@@ -183,7 +216,7 @@ const forgotPassword = asyncHandler(async(req, res) => {
   const user = await User.findOne({ email });
 
 		if (!user) {
-			throw new ApiError(500, "user not found")
+			throw new ApiError(400, "user not found")
 		}
 
 		// Generate reset token
@@ -200,7 +233,33 @@ const forgotPassword = asyncHandler(async(req, res) => {
 
 		return res.status(200).json(new ApiResponse(200, "Password reset link sent to your email"));
 })
+const resetPassword = asyncHandler (async (req, res) => {
+	
+		const { token } = req.params;
+		const { password } = req.body;
 
+		const user = await User.findOne({
+			resetPasswordToken: token,
+			resetPasswordExpiresAt: { $gt: Date.now() },
+		});
+
+		if (!user) {
+      throw new ApiError(400,"Invalid or expired reset token");
+	
+		}
+
+		// update password
+
+		user.password = password;
+		user.resetPasswordToken = undefined;
+		user.resetPasswordExpiresAt = undefined;
+		await user.save();
+
+		await sendResetSuccessEmail(user.email);
+    return res.status(200).json(new ApiResponse(200,"Password reset successful"));
+		
+	
+});
 const refreshAccessToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
 
@@ -357,13 +416,15 @@ const updateCoverImage = asyncHandler( async (req,res)=>{
 
 export {
   registerUser,
+  verifyEmail,
   loginUser,
   logoutUser,
-  refreshAccessToken,
   forgotPassword,
+  resetPassword,
   changeCurrentPassword,
   getCurrentUser,
   updateAccountDetails,
   updateAvatar,
   updateCoverImage,
+  refreshAccessToken,
 }

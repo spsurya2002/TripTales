@@ -1,45 +1,35 @@
-//Routes for comment
 import { Router } from "express";
 import {
     addComment,
     getComments,
     updateComment,
     deleteComment,
-} from "../controllers/interactions/comment.controller.js"; // Adjust the path as necessary
-import { verifyJWT } from "../middlewares/auth.middleware.js"; // Ensure users are authenticated
-
-const router = Router();
-router.use(verifyJWT) // Apply JWT verification to all routes
-
-// Add a comment to a specific content type (album, video, blog)
-router.post("/comments/:contentType/:contentId", addComment)
-      // Get all comments for a specific content type (album, video, blog)
-      .get("/comments/:contentType/:contentId", getComments);
-
-       // Update a comment by ID
-router.put("/comments/:commentId", updateComment)
-       // Delete a comment by ID
-      .delete("/comments/:commentId", deleteComment);
-      // Remove all comments made by the authenticated user
-
-
-//Routes for likes
+} from "../controllers/interactions/comment.controller.js"; 
 import { 
     addLike,
     getLikes, 
     removeLike
  } from "../controllers/interactions/like.controller.js";
 
-router.route("/likes/:contentType/:contentId")
+import { verifyJWT } from "../middlewares/auth.middleware.js"; // Ensure users are authenticated
+const router = Router();
+router.use(verifyJWT) // Apply JWT verification to all routes
+
+
+//Routes for comment
+router.post("/comments/:contentType/:contentId", addComment)// Add a comment to a specific content type (album, video, blog)
+     .get("/comments/:contentType/:contentId", getComments);// Get all comments for a specific content type (album, video, blog)
+router.put("/comments/:commentId", updateComment)// Update a comment by ID
+      .delete("/comments/:commentId", deleteComment);// Delete a comment by ID
+  
+
+//Routes for likes
+router.route("/likes/:contentType/:contentId")//add a like on a specific content type
     .post(addLike);
-
-// Get all likes for a specific content type
-router.route("/likes/:contentType/:contentId")
+router.route("/likes/:contentType/:contentId") // Get all likes for a specific content type
     .get(getLikes);
-
-// Remove a like from a specific content type
 router.route("/likes/:contentType/:contentId")
-    .delete(removeLike);
+    .delete(removeLike);          // Remove a like from a specific content type
 
     
 export default router;

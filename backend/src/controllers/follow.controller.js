@@ -1,9 +1,9 @@
 import mongoose, { isValidObjectId } from "mongoose";
-import { Follower } from "../../models/follower.model.js";
-import { User } from "../../models/user.model.js";
-import { ApiError } from "../../utils/ApiError.js";
-import { ApiResponse } from "../../utils/ApiResponse.js";
-import { asyncHandler } from "../../utils/asyncHandler.js";
+import { Follower } from "../models/follow.model.js";
+import { User } from "../models/auth/user.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 // Follow a user
 const followUser = asyncHandler(async (req, res) => {
@@ -94,45 +94,10 @@ const getUserFollowing = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, "Following users fetched successfully", following));
 });
 
-// Remove all followers for a user
-const removeAllFollowers = asyncHandler(async (req, res) => {
-    const userId = req.user?._id;
-
-    if (!isValidObjectId(userId)) {
-        throw new ApiError(400, "Invalid user Id");
-    }
-
-    const removedFollowers = await Follower.deleteMany({ following: userId });
-
-    if (removedFollowers.deletedCount === 0) {
-        throw new ApiError(400, "Something went wrong while removing all followers");
-    }
-
-    return res.status(200).json(new ApiResponse(200, "All followers removed successfully"));
-});
-
-// Remove all users followed by a user
-const removeAllFollowing = asyncHandler(async (req, res) => {
-    const userId = req.user?._id;
-
-    if (!isValidObjectId(userId)) {
-        throw new ApiError(400, "Invalid user Id");
-    }
-
-    const removedFollowing = await Follower.deleteMany({ follower: userId });
-
-    if (removedFollowing.deletedCount === 0) {
-        throw new ApiError(400, "Something went wrong while removing all following users");
-    }
-
-    return res.status(200).json(new ApiResponse(200, "All following users removed successfully"));
-});
 
 export {
     followUser,
     unfollowUser,
     getUserFollowers,
     getUserFollowing,
-    removeAllFollowers,
-    removeAllFollowing
 };
