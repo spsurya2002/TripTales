@@ -28,6 +28,41 @@ export const VERIFICATION_EMAIL_TEMPLATE = `
 </html>
 `;
 
+
+export const WELCOME_EMAIL_TEMPLATE=`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Trip Tales!</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <div style="background: linear-gradient(to right, #4CAF50, #45a049); padding: 20px; text-align: center;">
+    <h1 style="color: white; margin: 0;">Welcome to Trip Tales, {name}!</h1>
+  </div>
+
+  <div style="background-color: #f9f9f9; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    <p>Hi {name},</p>
+    <p>Thank you for joining <strong>Trip Tales</strong>, the ultimate platform for travel enthusiasts! We’re thrilled to have you as a part of our community, where you can share your adventures, connect with other explorers, and discover incredible stories from around the globe.</p>
+    
+    <p>Here's what you can do on Trip Tales:</p>
+    <ul>
+      <li><strong>Share Your Stories:</strong> Upload your travel blogs, videos, and photo albums.</li>
+      <li><strong>Explore:</strong> Discover amazing trips shared by fellow travelers.</li>
+      <li><strong>Connect:</strong> Follow other explorers and engage with the community.</li>
+    </ul>
+
+    <p>We hope you enjoy your experience with us. If you have any questions or need assistance, feel free to contact our support team.</p>
+
+    <p>Happy traveling!<br>Best regards,<br>The Trip Tales Team</p>
+  </div>
+
+  <div style="text-align: center; margin-top: 20px; color: #888; font-size: 0.8em;">
+    <p>This is an automated message, please do not reply to this email.</p>
+  </div>
+</body>
+</html>
+`
 export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
 <!DOCTYPE html>
 <html lang="en">
@@ -93,3 +128,4 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = `
 </body>
 </html>
 `;
+

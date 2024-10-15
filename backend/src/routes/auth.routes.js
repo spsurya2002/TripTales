@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { 
-    registerUser,
+    signup,
     loginUser,
     logoutUser,
     forgotPassword,
@@ -12,7 +12,7 @@ import {
     updateAvatar,
     updateCoverImage,
     verifyEmail,
-    checkAuth
+   
  } from "../controllers/auth/auth.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -31,17 +31,15 @@ router.route("/signup").post(
             maxCount: 1
         }
     ]), 
-    registerUser
+    signup
 );
-router.route("/check-auth").get( verifyJWT, checkAuth);
+
 router.route("/login").post(loginUser);// User login
-
 router.route("/logout").post(verifyJWT, logoutUser);// User logout with JWT verification
-
 router.route("/verify-email").post( verifyEmail);//verify email
-
 router.route("/forgot-password").post(forgotPassword);// Forgot password route
 router.route("/reset-password/:token").post( resetPassword);
+
 router.route("/refresh-token").post(refreshAccessToken);// Refresh access token
 
 router.route("/change-password").put(verifyJWT, changeCurrentPassword);// Change current user password (requires JWT verification)
@@ -56,74 +54,3 @@ router.route("/update-coverImage").put(verifyJWT, upload.single("coverImage"), u
 
 export default router;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import { Router } from "express";
-// import { 
-//     registerUser,
-//     loginUser,
-//     logoutUser,
-//     refreshAccessToken,
-//     changeCurrentPassword,
-//     getCurrentUser,
-//     updateAccountDetails,
-//     updateAvatar,
-//     updatecoverImage,
-//  } from "../controllers/user.controller.js";
-// import {upload} from "../middlewares/multer.middleware.js"
-// import { verifyJWT } from "../middlewares/auth.middleware.js";
-// const router = Router()
-
-// router.route("/register").post(
-//     upload.fields([
-//         {
-//             name:"avatar",
-//             maxCount:1
-//         },
-//         {
-//             name:"coverImage",
-//             maxCount:1 
-//         }
-//     ]),
-//     registerUser)
-//     router.route("/login").post(loginUser);
-//     router.route("/logout").post(verifyJWT,logoutUser);
-//     router.route("/refresh-token").post(refreshAccessToken);
-//     router.route("/change-password").post(verifyJWT, changeCurrentPassword);
-//     router.route("/get-user").get(verifyJWT, getCurrentUser);
-//     router.route("/update-account").post(verifyJWT, updateAccountDetails);
-//     router.route("/update-avatar").post(verifyJWT, upload.single("avatar"), updateAvatar);
-//     router.route("/update-coverImage").post( verifyJWT, upload.single("coverImage"), updatecoverImage);
-// export default router

@@ -29,7 +29,7 @@ const generateAccessAndRefereshTokens = async function(userId){
        }
 }
 
-const registerUser = asyncHandler( async (req,res)=>{
+const signup = asyncHandler( async (req,res)=>{
   /*
      1. get user details from frontend
      2. validation -not empty
@@ -58,7 +58,7 @@ const registerUser = asyncHandler( async (req,res)=>{
     if(existedUser){
       throw new ApiError(409,"User  already exists!!")
     }
-    /*const avatarLocalPath =  req.files?.avatar[0]?.path;
+    const avatarLocalPath =  req.files?.avatar[0]?.path;
     
     // const coverImageLocalPath =  req.files?.coverImage[0]?.path;
     let coverImageLocalPath;
@@ -77,7 +77,7 @@ const registerUser = asyncHandler( async (req,res)=>{
     const coverImage = await uploadOnCloudinary(coverImageLocalPath);
     if(!avatar){
       throw new ApiError(400,"failure occured at upload on cloudinary!!")
-    }*/
+    }
    
     const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -87,8 +87,8 @@ const registerUser = asyncHandler( async (req,res)=>{
       username:username.toLowerCase(),
       email,
       password,
-      // avatar: avatar.url,
-      // coverImage:coverImage?.url||"",
+      avatar: avatar.url,
+      coverImage:coverImage?.url||"",
       verificationToken,
 			verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
     })
@@ -144,13 +144,13 @@ const loginUser = asyncHandler( async (req,res)=>{
   if valid then give then send access and refresh token cookies
   */
   
-  const {username ,email , password}=req.body;
+  const {email , password}=req.body;
   // console.log(username,email);
-  if(!username && !email){
-    throw new ApiError(400,"username or email is required")
+  if( !email){
+    throw new ApiError(400,"email is required")
   }
    const user = await User.findOne({
-    $or:[{username},{email}]
+    $or:[{email}]
    })
 
    if(!user){
@@ -414,21 +414,9 @@ const updateCoverImage = asyncHandler( async (req,res)=>{
   .json(new ApiResponse(200, userDetail,"coverImage updated  successfully!!"))
   
 })
-const checkAuth = async (req, res) => {
-	try {
-		const user = await User.findById(req.user?._id).select("-password");
-		if (!user) {
-			return res.status(400).json({ success: false, message: "User not found" });
-		}
 
-		res.status(200).json({ success: true, user });
-	} catch (error) {
-		console.log("Error in checkAuth ", error);
-		res.status(400).json({ success: false, message: error.message });
-	}
-};
 export {
-  registerUser,
+  signup,
   verifyEmail,
   loginUser,
   logoutUser,
@@ -440,5 +428,5 @@ export {
   updateAvatar,
   updateCoverImage,
   refreshAccessToken,
-  checkAuth,
+  
 }

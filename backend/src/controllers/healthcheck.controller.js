@@ -6,7 +6,6 @@ const healthcheck = asyncHandler(async (req, res) => {
         new ApiResponse(200, "ALL OK!")
     )
 })
-
 export {
     healthcheck
     }
