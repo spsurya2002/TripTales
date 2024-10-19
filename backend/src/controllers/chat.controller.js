@@ -1,6 +1,6 @@
-import Conversation from "../../models/conversation.model.js";
+import Conversation from "../models/chat.conversation.model.js";
 import mongoose, {isValidObjectId} from "mongoose"
-import Message from "../../models/message.model.js";
+import Message from "../models/chat.message.model.js";
 import { v2 as cloudinary } from "cloudinary";
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { asyncHandler } from "../utils/asyncHandler.js";

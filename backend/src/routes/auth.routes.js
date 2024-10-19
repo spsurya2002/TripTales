@@ -13,7 +13,7 @@ import {
     updateCoverImage,
     verifyEmail,
    
- } from "../controllers/auth/auth.controller.js";
+ } from "../controllers/auth.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 

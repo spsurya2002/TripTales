@@ -1,7 +1,25 @@
-// src/models/interactions/like.model.js
-
-import mongoose from 'mongoose';
-
+import mongoose from "mongoose";
+const commentSchema = new mongoose.Schema({
+    content: {
+        type: String,
+        required: true,
+    },
+    contentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+    },
+    contentType: {
+        type: String,
+        enum: ['album', 'video', 'blog'],
+        required: true,
+    },
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true, 
+    },
+    
+});
 const likeSchema = new mongoose.Schema({
     contentId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -21,3 +39,4 @@ const likeSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 export const Like = mongoose.model('Like', likeSchema);
+export const Comment = mongoose.model("Comment", commentSchema);

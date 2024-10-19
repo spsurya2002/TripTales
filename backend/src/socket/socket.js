@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import http from "http";
-import Message from "../models/user/message.model.js";
-import Conversation from "../models/user/conversation.model.js";
+import Message from "../models/chat.conversation.model.js";
+import Conversation from "../models/chat.conversation.model.js";
 import { app } from "../../app.js"; // Import your existing Express app
 
 const server = http.createServer(app); // Create HTTP server using the Express app

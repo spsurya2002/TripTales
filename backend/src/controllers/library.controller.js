@@ -1,8 +1,13 @@
-import { Playlist } from "../../models/library/playlist.model.js";
-import { ApiError } from "../../utils/ApiError.js";
-import { ApiResponse } from "../../utils/ApiResponse.js";
-import { asyncHandler } from "../../utils/asyncHandler.js";
+import { Playlist } from "../models/library.playlist.model.js";
+import { WatchHistory } from "../models/library.watchHistory.model.js";
+import { watchLater } from "../models/library.watchLater.model.js";
+import { Video } from "../models/content.video.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import { isValidObjectId } from "mongoose";
+
+//Controllers for custom playlist-->
 
 // Create a new playlist
 const createPlaylist = asyncHandler(async (req, res) => {
@@ -20,7 +25,31 @@ const createPlaylist = asyncHandler(async (req, res) => {
 
     return res.status(201).json(new ApiResponse(201, "Playlist created successfully", playlist));
 });
+// Add a video to a playlist
+const addVideoToPlaylist = asyncHandler(async (req, res) => {
+    const { playlistId } = req.params;
+    const { videoId } = req.params;
 
+    if (!isValidObjectId(playlistId) || !isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid playlist or video Id");
+    }
+    const video =  await Video.findById(videoId);
+    if(!video){
+        throw new ApiError(400, "Video does not exist!!");
+    }
+
+    const playlist = await Playlist.findOneAndUpdate(
+        { _id: playlistId, owner: req.user._id },
+        { $addToSet: { videos: videoId } }, // Use $addToSet to avoid duplicates
+        { new: true }
+    );
+
+    if (!playlist) {
+        throw new ApiError(404, "Playlist not found or you don't have permission to add video to this playlist");
+    }
+
+    return res.status(200).json(new ApiResponse(200, "Video added to playlist successfully", playlist));
+});
 // Get all playlists for the logged-in user
 const getUserPlaylists = asyncHandler(async (req, res) => {
     const playlists = await Playlist.find({ owner: req.user._id })
@@ -52,6 +81,25 @@ const updatePlaylist = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, "Playlist updated successfully", playlist));
 });
 
+const getPlaylistById = asyncHandler(async (req, res) => {
+    const { playlistId } = req.params;
+
+    if (!isValidObjectId(playlistId)) {
+        throw new ApiError(400, "Invalid playlist Id");
+    }
+
+    const playlist = await Playlist.findById(playlistId)
+        .populate("videos", "title description") // Populating video details
+        .populate("owner", "username") // Populating owner (user) details
+        .lean();
+
+    if (!playlist) {
+        throw new ApiError(404, "Playlist not found");
+    }
+
+    return res.status(200).json(new ApiResponse(200, "Playlist fetched successfully", playlist));
+});
+
 // Delete a specific playlist
 const deletePlaylist = asyncHandler(async (req, res) => {
     const { playlistId } = req.params;
@@ -70,28 +118,6 @@ const deletePlaylist = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json(new ApiResponse(200, "Playlist deleted successfully", deletedPlaylist));
-});
-
-// Add a video to a playlist
-const addVideoToPlaylist = asyncHandler(async (req, res) => {
-    const { playlistId } = req.params;
-    const { videoId } = req.params;
-
-    if (!isValidObjectId(playlistId) || !isValidObjectId(videoId)) {
-        throw new ApiError(400, "Invalid playlist or video Id");
-    }
-
-    const playlist = await Playlist.findOneAndUpdate(
-        { _id: playlistId, owner: req.user._id },
-        { $addToSet: { videos: videoId } }, // Use $addToSet to avoid duplicates
-        { new: true }
-    );
-
-    if (!playlist) {
-        throw new ApiError(404, "Playlist not found or you don't have permission to add video to this playlist");
-    }
-
-    return res.status(200).json(new ApiResponse(200, "Video added to playlist successfully", playlist));
 });
 
 // Remove a video from a playlist
@@ -115,33 +141,153 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
 
     return res.status(200).json(new ApiResponse(200, "Video removed from playlist successfully", playlist));
 });
-const getPlaylistById = asyncHandler(async (req, res) => {
-    const { playlistId } = req.params;
 
-    if (!isValidObjectId(playlistId)) {
-        throw new ApiError(400, "Invalid playlist Id");
+
+//Controllers for watch history-->
+
+// Add a video to watch history
+const addToWatchHistory = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid video Id");
     }
 
-    const playlist = await Playlist.findById(playlistId)
-        .populate("videos", "title description") // Populating video details
-        .populate("owner", "username") // Populating owner (user) details
+    const historyEntry = await WatchHistory.create({
+        videoId,
+        userId: req.user._id
+    });
+
+    return res.status(201).json(new ApiResponse(201, "Video added to watch history", historyEntry));
+});
+
+// Get watch history for the logged-in user
+const getWatchHistory = asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+
+    const history = await WatchHistory.find({ userId })
+        .populate("videoId", "title") // Assuming you want to show video titles
         .lean();
 
-    if (!playlist) {
-        throw new ApiError(404, "Playlist not found");
+    return res.status(200).json(new ApiResponse(200, "Watch history fetched successfully", history));
+});
+
+// Clear the watch history for the logged-in user
+const clearWatchHistory = asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+
+    await WatchHistory.deleteMany({ userId });
+
+    return res.status(200).json(new ApiResponse(200, "Watch history cleared successfully"));
+});
+
+// Remove a particular video from the watch history
+const removeFromWatchHistory = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid video Id");
     }
 
-    return res.status(200).json(new ApiResponse(200, "Playlist fetched successfully", playlist));
+    const deletedEntry = await WatchHistory.findOneAndDelete({
+        videoId,
+        userId: req.user._id
+    });
+
+    if (!deletedEntry) {
+        throw new ApiError(404, "Video not found in watch history");
+    }
+
+    return res.status(200).json(new ApiResponse(200, "Video removed from watch history", deletedEntry));
 });
-    
+
+//controllers for watch later-->
+
+// Add a video to the Watch Later list
+const addToWatchLater = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+    const userId = req.user._id;
+
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid video Id");
+    }
+
+    const video = await Video.findById(videoId);
+    if (!video) {
+        throw new ApiError(404, "Video not found");
+    }
+
+    let userWatchLater = await watchLater.findOne({ owner: userId });
+
+    if (!userWatchLater) {
+        userWatchLater = new watchLater({ owner: userId, videos: [] });
+    }
+
+    // Check if the video is already in the Watch Later list
+    if (userWatchLater.videos.includes(videoId)) {
+        throw new ApiError(400, "Video already in Watch Later list");
+    }
+
+    userWatchLater.videos.push(videoId);
+    await userWatchLater.save();
+
+    return res.status(201).json(new ApiResponse(201, "Video added to Watch Later", userWatchLater));
+});
+
+// Get all videos in the Watch Later list for the current user
+const getWatchLater = asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+
+    const userWatchLater = await watchLater.findOne({ owner: userId })
+        .populate("videos", "title description")
+        .lean();
+
+    if (!userWatchLater || userWatchLater.videos.length === 0) {
+        throw new ApiError(404, "No videos found in Watch Later list");
+    }
+
+    return res.status(200).json(new ApiResponse(200, "Watch Later list fetched successfully", userWatchLater.videos));
+});
+
+// Remove a video from the Watch Later list
+const removeFromWatchLater = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+    const userId = req.user._id;
+
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid video Id");
+    }
+
+    const userWatchLater = await watchLater.findOne({ owner: userId });
+
+    if (!userWatchLater || !userWatchLater.videos.includes(videoId)) {
+        throw new ApiError(404, "Video not found in Watch Later list");
+    }
+
+    // Remove the video from the Watch Later list
+    userWatchLater.videos = userWatchLater.videos.filter((id) => id.toString() !== videoId);
+    await userWatchLater.save();
+
+    return res.status(200).json(new ApiResponse(200, "Video removed from Watch Later", userWatchLater));
+});
 export {
+    //custom playlist
     createPlaylist,
-    getUserPlaylists,
+    addVideoToPlaylist,
+    removeVideoFromPlaylist,
     updatePlaylist,
     deletePlaylist,
     getPlaylistById,
-    addVideoToPlaylist,
-    removeVideoFromPlaylist,
+    getUserPlaylists,
+    //watch history
+    addToWatchHistory,
+    getWatchHistory,
+    clearWatchHistory,
+    removeFromWatchHistory,     
+    //watch later
+    addToWatchLater,
+    getWatchLater,
+    removeFromWatchLater 
 };
 
 

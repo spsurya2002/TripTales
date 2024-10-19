@@ -34,7 +34,7 @@ if (process.env.NODE_ENV === "production") {
 import authRouter from './src/routes/auth.routes.js'
 import healthcheckRouter from "./src/routes/healthcheck.routes.js"
 import contentRouter from './src/routes/content.routes.js'
-import interactionsRouter from './src/routes/interactions.routes.js'
+import interactionsRouter from './src/routes/likeAndComment.routes.js'
 import libraryRouter from './src/routes/library.routes.js'
 import followRouter from './src/routes/follow.routes.js'
 // //routes declaration

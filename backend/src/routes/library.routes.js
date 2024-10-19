@@ -1,41 +1,27 @@
 import { Router } from "express";
-//Routes for history
 import {
-    addToWatchHistory,
-    getWatchHistory,
-    clearWatchHistory,
-    removeFromWatchHistory // Import the new method
-} from "../controllers/library/watchHistory.controller.js";
-import {
+    //custom playlist
     createPlaylist,
-    getUserPlaylists,
+    addVideoToPlaylist,
+    removeVideoFromPlaylist,
     updatePlaylist,
     deletePlaylist,
     getPlaylistById,
-    addVideoToPlaylist,
-    removeVideoFromPlaylist,
-} from "../controllers/library/playlist.controller.js";
-import { 
-    addToWatchLater, 
-    getWatchLater, 
+    getUserPlaylists,
+    //watch history
+    addToWatchHistory,
+    getWatchHistory,
+    clearWatchHistory,
+    removeFromWatchHistory,     
+    //watch later
+    addToWatchLater,
+    getWatchLater,
     removeFromWatchLater 
-} from "../controllers/library/watchLater.controller.js";
-
+} from "../controllers/library.controller.js";
 
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 const router = Router();
 router.use(verifyJWT);// Middleware to verify JWT for authentication
-
-
-//routes for watch history
-router.route("/watchHistory/:videoId")
-    .post(addToWatchHistory)// Add a video to watch history
-    .delete(removeFromWatchHistory);//remove a video from watch history
-router.route("/watchHistory")
-    .get(getWatchHistory)    // Get watch history for the user
-    .delete(clearWatchHistory);    // Clear watch history for the user
-
-
 
 //routes for playlist
 router.route("/playlist")
@@ -49,7 +35,13 @@ router.route("/playlist/:playlistId/:videoId")
     .post(addVideoToPlaylist)// Add a video to a playlist
     .delete(removeVideoFromPlaylist); // Remove a video from a playlist
 
-
+//routes for watch history
+router.route("/watchHistory/:videoId")
+    .post(addToWatchHistory)// Add a video to watch history
+    .delete(removeFromWatchHistory);//remove a video from watch history
+router.route("/watchHistory")
+    .get(getWatchHistory)    // Get watch history for the user
+    .delete(clearWatchHistory);    // Clear watch history for the user
 
 //Routes for watch later
 router.route("/watchLater/:videoId")

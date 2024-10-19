@@ -1,10 +1,10 @@
-import { Blog } from "../../models/content/blog.model.js";
+import { Blog } from "../models/content.blog.model.js";
 import mongoose, {isValidObjectId} from "mongoose"
-import {User} from "../../models/auth/user.model.js"
-import {ApiError} from "../../utils/ApiError.js"
-import {ApiResponse} from "../../utils/ApiResponse.js"
-import {asyncHandler} from "../../utils/asyncHandler.js"
-import {uploadOnCloudinary,deleteFromCloudinary} from "../../utils/cloudinary.js"
+import {User} from "../models/user.model.js"
+import {ApiError} from "../utils/ApiError.js"
+import {ApiResponse} from "../utils/ApiResponse.js"
+import {asyncHandler} from "../utils/asyncHandler.js"
+import {uploadOnCloudinary,deleteFromCloudinary} from "../utils/cloudinary.js"
 
 const postBlog = asyncHandler (async (req,res)=>{
 

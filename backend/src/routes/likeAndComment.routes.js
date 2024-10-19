@@ -1,15 +1,15 @@
 import { Router } from "express";
 import {
+    //comments
     addComment,
     getComments,
     updateComment,
     deleteComment,
-} from "../controllers/interactions/comment.controller.js"; 
-import { 
+    //likes
     addLike,
-    getLikes, 
-    removeLike
- } from "../controllers/interactions/like.controller.js";
+    getLikes,
+    removeLike,
+} from "../controllers/likeAndComment.controller.js"; 
 
 import { verifyJWT } from "../middlewares/auth.middleware.js"; // Ensure users are authenticated
 const router = Router();

@@ -1,10 +1,10 @@
 import mongoose, {isValidObjectId} from "mongoose"
-import {Video} from "../../models/content/video.model.js"
-import {User} from "../../models/auth/user.model.js"
-import {ApiError} from "../../utils/ApiError.js"
-import {ApiResponse} from "../../utils/ApiResponse.js"
-import {asyncHandler} from "../../utils/asyncHandler.js"
-import {uploadOnCloudinary,deleteFromCloudinary} from "../../utils/cloudinary.js"
+import {Video} from "../models/content.video.model.js"
+import {User} from "../models/user.model.js"
+import {ApiError} from "../utils/ApiError.js"
+import {ApiResponse} from "../utils/ApiResponse.js"
+import {asyncHandler} from "../utils/asyncHandler.js"
+import {uploadOnCloudinary,deleteFromCloudinary} from "../utils/cloudinary.js"
 
 const publishAVideo = asyncHandler(async (req, res) => {
     // TODO: get video, upload to cloudinary, create video

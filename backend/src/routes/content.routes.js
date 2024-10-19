@@ -6,7 +6,7 @@ import {
    getAlbumById,
    getAllAlbums,
    deleteAlbum
-} from "../controllers/content/album.controller.js";
+} from "../controllers/content.album.controller.js";
 //imports for videos
 import {
     getAllVideos,
@@ -15,7 +15,7 @@ import {
     updateVideo,
     deleteVideo,
     changeThumbnail
- } from "../controllers/content/video.controller.js";
+ } from "../controllers/content.video.controller.js";
  //imports for blogs
 import {
     postBlog,
@@ -24,7 +24,7 @@ import {
     getBlogById,
     updateBlogByID,
     deleteBlogByID
-  } from "../controllers/content/blog.controller.js";
+  } from "../controllers/content.blog.controller.js";
 
 
 import {upload} from "../middlewares/multer.middleware.js";
