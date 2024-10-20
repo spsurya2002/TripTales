@@ -37,6 +37,8 @@ import contentRouter from './src/routes/content.routes.js'
 import interactionsRouter from './src/routes/likeAndComment.routes.js'
 import libraryRouter from './src/routes/library.routes.js'
 import followRouter from './src/routes/follow.routes.js'
+import chatRouter from './src/routes/chat.routes.js'
+
 // //routes declaration
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/healthcheck", healthcheckRouter)
@@ -44,6 +46,7 @@ app.use("/api/v1/content", contentRouter)
 app.use("/api/v1/interactions",interactionsRouter)
 app.use("/api/v1/library",libraryRouter)
 app.use("/api/v1/follow",followRouter)
+app.use("/api/v1/chat",chatRouter)
 
 export { app };
 
