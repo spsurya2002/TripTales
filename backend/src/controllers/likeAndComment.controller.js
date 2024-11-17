@@ -21,7 +21,9 @@ const getContentModel = (contentType) => {
             throw new ApiError(400, "Invalid content type");
     }
 };
+
 //Comment controllers-->
+
 // Add a comment to any content type (album, video, blog)
 const addComment = asyncHandler(async (req, res) => {
     const { contentType, contentId } = req.params;

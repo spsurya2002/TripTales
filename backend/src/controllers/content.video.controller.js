@@ -58,7 +58,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(new ApiResponse(200,createdVideo,"video uploaded  successfully!!"))
-})//done
+})
 
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
@@ -74,7 +74,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200,data,"video found successfully!!"))
 
-})//done
+})
 
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
@@ -89,7 +89,7 @@ const getVideoById = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200,data,"video found of this id"))
 
-})//done
+})
 
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
@@ -213,9 +213,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(new ApiResponse(200,{videodeletedFromCloudinary,thumbnaildeletedFromCloudinary},"video deleted successfully!!"))
-})//done
-
-
+})
 
 export {
     getAllVideos,

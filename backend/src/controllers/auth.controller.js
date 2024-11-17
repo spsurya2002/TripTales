@@ -102,6 +102,7 @@ const signup = asyncHandler( async (req,res)=>{
       new ApiResponse(200, createdUser, "User created Successfully")
   )
 })  
+
 const verifyEmail = asyncHandler( async (req, res) => {
 	const { code } = req.body;
 		const user = await User.findOne({
@@ -234,6 +235,7 @@ const forgotPassword = asyncHandler(async(req, res) => {
 
 		return res.status(200).json(new ApiResponse(200, "Password reset link sent to your email"));
 })
+
 const resetPassword = asyncHandler (async (req, res) => {
 	
 		const { token } = req.params;
@@ -261,6 +263,7 @@ const resetPassword = asyncHandler (async (req, res) => {
 		
 	
 });
+
 const refreshAccessToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
 

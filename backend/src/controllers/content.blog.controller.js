@@ -129,7 +129,8 @@ const updateBlogByID = asyncHandler(async (req, res) => {
   
     // Send success response
     return res.status(200).json(new ApiResponse(200, blog, "Blog updated successfully"));
-  });
+});
+
   const deleteBlogByID = asyncHandler(async (req, res) => {
     const { blogId } = req.params;
   
@@ -154,9 +155,8 @@ const updateBlogByID = asyncHandler(async (req, res) => {
   
     // Send response
     return res.status(200).json(new ApiResponse(200, null, "Blog deleted successfully"));
-  });
+});
   
-
 export {
     postBlog,
     getAllBlogs,

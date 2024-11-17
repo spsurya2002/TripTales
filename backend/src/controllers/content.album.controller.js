@@ -85,7 +85,8 @@ const updateAlbum = asyncHandler(async (req, res) => {
       return res
           .status(200)
           .json(new ApiResponse(200,updateAlbum,"album updated  successfully!!"))
-})//done
+})
+
 const getAlbumById = asyncHandler(async (req, res) => {
     const { albumId } = req.params;
     if(!isValidObjectId(albumId)){
@@ -116,6 +117,7 @@ const getAllAlbums = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200,albums,"Albums found successfully!!"))
 
 })
+
 const deleteAlbum = asyncHandler(async (req, res) => {
     const { albumId } = req.params
     //TODO: delete album
@@ -146,7 +148,7 @@ const deleteAlbum = asyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(new ApiResponse(200,"album deleted successfully!!"))
-})//done
+})
 
 export{
     uploadAlbum,
